@@ -1,0 +1,64 @@
+version: '3.4'
+
+services:
+
+  collector:
+    container_name: dockerflow-collector
+    restart: always
+    build:
+      context: .
+      dockerfile: ./collector/Dockerfile
+    environment:
+      TZ: America/Cuiaba
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro" #necessário para acesso a API do Docker
+      - "./appsettings.json:/app/appsettings.json"
+    networks:
+      - dockerflow-network
+    depends_on:
+      - db
+
+  api:
+    container_name: dockerflow-api
+    restart: always
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    environment:
+      TZ: America/Cuiaba
+    volumes:
+    #  - "/var/run/docker.sock:/var/run/docker.sock:ro" #necessário para acesso a API do Docker
+      - "./appsettings.json:/app/appsettings.json"
+    ports:
+      - 5000:5000
+    networks:
+      - dockerflow-network
+    depends_on:
+      - db
+
+  db:
+    container_name: dockerflow-db
+    restart: always
+    image: "postgres:14"
+    environment:
+      POSTGRES_USER: dockerflow
+      POSTGRES_PASSWORD: mysecretpassword
+      PGDATA: /var/lib/postgresql/data/pgdata
+      TZ: America/Cuiaba
+    #volumes:
+    #  - ./pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    mem_limit: 128m
+    networks:
+      - dockerflow-network
+
+  example:
+    container_name: example-dockerflow
+    build:
+      context: .
+      dockerfile: ./example/Dockerfile
+
+networks:
+  dockerflow-network:
+    driver: bridge

@@ -1,8 +1,4 @@
-using Newtonsoft.Json;
-
-namespace DockerFlow.Domain;
-
-
+﻿namespace DockerFlow;
 public class Task : IDisposable
 {
     public string task_name {get; private set;} = String.Empty;

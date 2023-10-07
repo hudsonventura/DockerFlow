@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-front/node_modules
+src/front/node_modules
 /.pnp
 .pnp.js
 
@@ -23,11 +23,13 @@ yarn-debug.log*
 yarn-error.log*
 
 
-api/bin/*
-api/obj/*
-collector/bin/*
-collector/obj/*
-example/bin/*
-example/obj/*
-Shared/bin/*
-Shared/obj/*
+src/api/bin/*
+src/api/obj/*
+src/collector/bin/*
+src/collector/obj/*
+src/example/bin/*
+src/example/obj/*
+src/Shared/bin/*
+src/Shared/obj/*
+src/package-nuget/obj/*
+src/package-nuget/bin/*

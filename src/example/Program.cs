@@ -1,4 +1,4 @@
-﻿using Task = DockerFlow.Domain.Task;
+﻿using Task = DockerFlow.Task;
 
 
 for (int i = 0; i < 10; i++)
