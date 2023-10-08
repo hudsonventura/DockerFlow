@@ -29,9 +29,13 @@ public class ContainerController : ControllerBase
             var containers = DockerAPI.getContainersCreated();
             return Ok(containers);
         }
-        catch (System.Exception)
+        catch (System.Exception error)
         {
-            return BadRequest("It's not possible to obtain the containers list");
+            string message = error.Message;
+            if(error.InnerException is not null){
+                message += error.InnerException.Message;
+            }
+            return BadRequest($"It's not possible to obtain the containers list, by the error: {message}");
         }
     }
     
@@ -50,9 +54,13 @@ public class ContainerController : ControllerBase
             var propeties = DockerAPI.inspectContainer(container);
             return Ok(propeties);
         }
-        catch (System.Exception)
+        catch (System.Exception error)
         {
-            return BadRequest("It's not possible to obtain the containers list");
+            string message = error.Message;
+            if(error.InnerException is not null){
+                message += error.InnerException.Message;
+            }
+            return BadRequest($"It's not possible to obtain the containers list, by the error: {message}");
         }
     }
 

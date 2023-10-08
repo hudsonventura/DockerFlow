@@ -1,10 +1,11 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using DockerFlow.Services;
 using Shared.Services;
 using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
 using DockerFlow.Domain;
 using Task = Shared.Domain.Task;
-
+using Shared.Domain;
 
 namespace api.Controllers;
 
@@ -61,13 +62,16 @@ public class ContainerTasksController : ControllerBase
                         task = new Task(){
                             task_name = log.task_name,
                             start = log.timestamp,
-                            status = Task.Status.Initialized
+                            status = Task.Status.Initialized,
+                            message = log.info,
+                            task_id = log.task_id
                         };
-                    }Console.WriteLine($"Tentando salvar os logs ... Sucesso! Salvo {logs.Count()}");
+                    }
 
-                    if(log.type == SystemLog.SystemLogType.End){
+                    if(log.type == SystemLog.SystemLogType.ErrorEnd || log.type == SystemLog.SystemLogType.WarnningEnd || log.type == SystemLog.SystemLogType.SuccessEnd){
                         task.end = log.timestamp;
-                        task.status = Task.Status.Success;
+                        task.status = (Task.Status)Convert.ToInt32(log.type);
+                        task.message = log.info;
                     }
                     
                 }
@@ -79,4 +83,66 @@ public class ContainerTasksController : ControllerBase
         return Ok(ret);
     }
 
+
+    [HttpGet("/Container/Tasks/{container_id}/{task_id}")]
+    public IActionResult TaskLog(string container_id, Guid task_id){
+        var containers = DockerAPI.getContainersCreated();
+        if(!containers.Any(x => x.containerID == container_id)){
+            return NotFound($"No container found with id {container_id}");
+        }
+
+        var logs = _dbContext.system_logs
+                    .Where(x => x.container_id == container_id && x.task_id == task_id)
+                    .OrderBy(x => x.timestamp)
+                    .ToList();
+        if(logs.Count() == 0){
+            return NoContent();
+        }
+
+        return Ok(logs);
+    }
+
+
+    [HttpGet("/Container/Tasks/{container_id}/durations")]
+    public IActionResult TasksDuration(string container_id){
+        var containers = DockerAPI.getContainersCreated();
+        if(!containers.Any(x => x.containerID == container_id)){
+            return NotFound($"No container found with id {container_id}");
+        }
+
+        var logs = _dbContext.system_logs
+                    .Where(x => x.container_id == container_id)
+                    .OrderBy(x => x.timestamp)
+                    .ToList();
+
+        if(logs.Count() == 0){
+            return NoContent();
+        }
+
+        var executions = logs.GroupBy(x => x.execution_id);
+
+
+        Dictionary<Guid, TaskDuration> ret = new Dictionary<Guid, TaskDuration>();
+        foreach (var execution in executions){
+            var firstExecution = execution.First(); // Primeiro elemento do grupo
+            var lastExecution = execution.Last();   // Último elemento do grupo
+            ret.Add(execution.Key, new TaskDuration(){
+                container_id = container_id,
+                start = firstExecution.timestamp,
+                end = lastExecution.timestamp,
+                duration = (int)(lastExecution.timestamp - firstExecution.timestamp).TotalMilliseconds
+            });
+        }
+
+
+        //obtain the max total time
+        var max = ret.Max(x => x.Value.duration);
+        foreach (var item in ret)
+        {
+            decimal percent = (decimal)item.Value.duration/max;
+            item.Value.percent = percent;
+        }
+
+        return Ok(ret);
+    }
 }
