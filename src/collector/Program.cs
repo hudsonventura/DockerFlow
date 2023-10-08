@@ -68,7 +68,7 @@ void getContainerLog(){
             {
                 Console.WriteLine($"Tentando obter os logs do container {container.serviceName} {container.containerID} ...");
                 var atual = logs_all.Where(x => x.containerID == container.containerID).FirstOrDefault();
-                if(atual == null || atual.last_update == DateTime.MinValue){ //verifica se o registro do container já existe na lista de logs para pegar o ultimo horario 
+                //if(atual == null || atual.last_update == DateTime.MinValue){ //verifica se o registro do container já existe na lista de logs para pegar o ultimo horario 
                     
                     //se entrou aqui, o container ainda não teve logs coletados no docker, mas...
                     var logs = DockerAPI.getContainerLog(container, DateTime.MinValue.ToUniversalTime());
@@ -77,12 +77,23 @@ void getContainerLog(){
                     try
                     {
                         DateTime max_date = max_date = dbContext.logs.Where(x => x.container_id == container.containerID).Max(x => x.timestamp);
-                        logs = logs.Where(x => x.timestamp >= max_date.AddSeconds(1)).ToList();
+                        DateTime max_date_system = DateTime.MinValue;
+                        try
+                        {
+                            max_date_system = dbContext.system_logs.Where(x => x.container_id == container.containerID).Max(x => x.timestamp);
+                        }
+                        catch (System.Exception)
+                        {
+                            
+                        }
+                        max_date = max_date > max_date_system ? max_date : max_date_system; //get the major log date
+                        logs = logs.Where(x => x.timestamp >= max_date).ToList();
                     }
                     catch (System.Exception)
                     {
                         
                     }
+                    
 
                     //adiciona os logs na lista de ContainerLogs (logs_all)
                     logs_all.Add(new ContainerLogs(){
@@ -90,14 +101,14 @@ void getContainerLog(){
                         logs = logs,
                         last_update = logs.Max(x => x.timestamp)
                     });
-                }else{
+                /*}else{
                     DateTime last_check = logs_all.Where(x => x.containerID == container.containerID).LastOrDefault().last_update.AddSeconds(1);
                     var logs = DockerAPI.getContainerLog(container, last_check);
 
                     //adiciona os novos logs na posiçao já existente
                     logs_all.Where(x => x.containerID == container.containerID).FirstOrDefault().logs.AddRange(logs);
                     logs_all.Where(x => x.containerID == container.containerID).FirstOrDefault().last_update = logs.Max(x => x.timestamp);
-                }
+                }*/
                 Console.WriteLine($"Tentando obter os logs do container {container.serviceName} {container.containerID} ... Sucesso!");
             }
             catch (System.Exception error)

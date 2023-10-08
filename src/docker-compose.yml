@@ -27,7 +27,7 @@ services:
     environment:
       TZ: America/Cuiaba
     volumes:
-    #  - "/var/run/docker.sock:/var/run/docker.sock:ro" #necessário para acesso a API do Docker
+      - "/var/run/docker.sock:/var/run/docker.sock:ro" #necessário para acesso a API do Docker
       - "./appsettings.json:/app/appsettings.json"
     ports:
       - 5000:5000

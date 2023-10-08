@@ -37,13 +37,51 @@ public class SystemLog : Log
             if(info == null){
                 Console.WriteLine();
             }
-            this.info = info;
-            if(info.StartsWith("Starting task")){
-                this.type = SystemLogType.Start;
+
+            
+
+            switch (info)
+            {
+                case string s when s.StartsWith("Starting task"):
+                    this.type = SystemLogType.Start;
+                    break;
+
+                case string s when s.StartsWith("End of task with success"):
+                    this.type = SystemLogType.SuccessEnd;
+                    break;
+
+                case string s when s.StartsWith("End of task with some critial error"):
+                    this.type = SystemLogType.ErrorEnd;
+                    break;
+
+                case string s when s.StartsWith("End of task with some warnning"):
+                    this.type = SystemLogType.WarnningEnd;
+                    break;
+                
+                case string s when s.StartsWith("ERROR"):
+                    this.type = SystemLogType.Error;
+                    break;
+            
+                case string s when s.StartsWith("INFO"):
+                    this.type = SystemLogType.Info;
+                    break;
+                
+                case string s when s.StartsWith("WARNNING"):
+                    this.type = SystemLogType.Warning;
+                    break;
+
+                case string s when s.StartsWith("DEBUG"):
+                    this.type = SystemLogType.Debug;
+                    break;
             }
-    
-            if(info.StartsWith("End of task")){
-                this.type = SystemLogType.End;
+
+            try
+            {
+                this.info = info.Split("|-|")[1].Trim();
+            }
+            catch (System.Exception)
+            {
+                this.info = this.type.ToString();
             }
         }
         catch (System.Exception)
@@ -63,12 +101,15 @@ public class SystemLog : Log
     public SystemLogType type { get; set; }
 
     public enum SystemLogType{
-        Start = 0,
-        End = 1,
-        Info = 2,
-        Warning = 3,
-        Error = 4, 
-        PartialError = 5
+        Nothing = 0,
+        Start = 1,
+        ErrorEnd = 2,
+        WarnningEnd = 3,
+        SuccessEnd = 4,
+        Info = 5,
+        Warning = 6,
+        Error = 7, 
+        Debug = 8
     }
     
 }
