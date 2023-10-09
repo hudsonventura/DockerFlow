@@ -130,7 +130,8 @@ public class ContainerTasksController : ControllerBase
                 container_id = container_id,
                 start = firstExecution.timestamp,
                 end = lastExecution.timestamp,
-                duration = (int)(lastExecution.timestamp - firstExecution.timestamp).TotalMilliseconds
+                duration = (int)(lastExecution.timestamp - firstExecution.timestamp).TotalMilliseconds,
+                status = lastExecution.type
             });
         }
 

@@ -15,9 +15,6 @@ public class SystemLog : Log
         
         try
         {
-            if(log.container_id == "c57f2d532638eda350c8944e38bfe281c128b4bdace34ba3daeb93f3af466cf5"){
-                Console.WriteLine();
-            }
             this.id = log.id;
             this.container_id = log.container_id;
             this.timestamp = log.timestamp;

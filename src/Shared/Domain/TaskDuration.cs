@@ -1,5 +1,7 @@
 using System;
-namespace Shared.Domain;
+
+
+namespace DockerFlow.Domain;
 
 public class TaskDuration
 {
@@ -8,4 +10,5 @@ public class TaskDuration
     public DateTime end { get; set; }
     public int duration { get; set; } //in seconds
     public decimal percent { get; set; }
+    public SystemLog.SystemLogType status { get; set; }
 }

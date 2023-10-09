@@ -2,7 +2,6 @@ import react, { useEffect, useState }from "react";
 import Log from "../services/Log";
 import { useParams } from "react-router-dom";
 import Api from '../services/Api';
-import { useHistory } from 'react-router-dom';
 
 
 
@@ -20,6 +19,16 @@ export default function Container() {
         textAlign: "left",
         height: "550px"
     };
+
+    const vertical_progress = {
+        position: "relative",
+        width: "40px",
+        min_height: "240px",
+        float: "left",
+        margin: "20px",
+      };
+      
+
 
     const[tasks, setTasks] = useState([]);
     useEffect(() => {
@@ -80,13 +89,70 @@ export default function Container() {
                         <td className="running-table" style={{ verticalAlign: "middle" }}>Tempo total</td>
                         {
                             Object.keys(durations).map((key, key1) => {
-                                const duration = durations[key]
+                                const duration = durations[key];
+                                let btnColor = "btn-success"; // Classe padrão
+                                let btnClass = "btn-success"; // Classe padrão
+                                let animated = "";
+                                let text = "";
+
+                                // Use um switch para determinar a classe com base no valor de duration.status
+                                switch (duration.status) {
+                                    case 1: //Started
+                                    btnColor = "#0dcaf0";
+                                    btnClass = "btn-info";
+                                    animated = "progress-bar-animated";
+                                    text = "Running";
+                                    break;
+
+                                    case 2: //ErrorEnd
+                                    btnColor = "#dc3545";
+                                    btnClass = "btn-danger"; 
+                                    text = "Ended with some errors";
+                                    break;
+
+                                    case 3: //WarnningEnd
+                                    btnColor = "#198754";
+                                    btnClass = "btn-warning";
+                                    text = "Ended with some warning";
+                                    break;
+                                
+                                    case 4: //SuccessEnd
+                                    btnColor = "#198754"; 
+                                    btnClass = "btn-success";
+                                    text = "Ended";
+                                    break;
+
+                                    case 5: //Info
+                                    btnColor = "#198754"; 
+                                    btnClass = "btn-info";
+                                    animated = "progress-bar-animated";
+                                    text = "Running and some info was informed";
+                                    break;
+
+
+                                    case 6: //Warning
+                                    btnColor = "#198754"; 
+                                    btnClass = "btn-warning";
+                                    animated = "progress-bar-animated";
+                                    text = "Running and some warning was informed";
+                                    break;
+
+                                    case 7: //Error
+                                    btnColor = "#dc3545"; 
+                                    btnClass = "btn-danger";
+                                    animated = "progress-bar-animated";
+                                    text = "Running and some error was informed";
+                                    break;
+ 
+                                }
                                 return <>
                                             <td className="running-table" style={{ verticalAlign: "bottom" }}>
+
                                                 <div className="d-flex justify-content-center align-items-end" style={{ height: duration.percent*200+'px' , justifyContent: "flex-end"}}>
-                                                    <div className="vr btn btn-success progress-bar progress-bar-striped progress-bar-animated running" style={{justifyContent: "flex-end"}}
-                                                    title={"Started at: "+duration.start.replace('T', ' ').slice(0, 24)+"\r\nEnded at: "+duration.end.replace('T', ' ').slice(0, 24)+"\r\nTotal duration: "+duration.duration/1000+" seconds\r\n\r\nInitialized"}> 
-                                                    </div>
+                                                    <div className={`vr ${btnClass} btn progress-bar progress-bar-striped ${animated}`} 
+                                                        style={{justifyContent: "flex-end", opacity: "70%", color: btnColor}}
+                                                        title={"Started at: "+duration.start.replace('T', ' ').slice(0, 24)+"\r\nEnded at: "+duration.end.replace('T', ' ').slice(0, 24)+"\r\nTotal duration: "+duration.duration/1000+" seconds\r\n\r\nInitialized"}>
+                                                    </div> 
                                                 </div>
                                             </td>
                                 </>

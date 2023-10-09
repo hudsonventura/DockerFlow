@@ -62,15 +62,15 @@ void run(int thread){
     int rand = random.Next(1, 100);
     Thread.Sleep(rand*100);
 
-    if(rand < 33){
-        task.SuccessEnd(); //The program '[40998] Example.dll' has exited with code 0 (0x0).
+    if(rand > 96){
+        task.ErrorEnd($"Random value is {rand}");
         return;
     }
-    if(rand < 66){
+    if(rand > 98){
         task.WaningEnd($"Random value is {rand}");
         return;
     }
-    task.ErrorEnd($"Random value is {rand}");
+    task.SuccessEnd(); //The program '[40998] Example.dll' has exited with code 0 (0x0).
     
 }
 
