@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Drawing;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.RegularExpressions;
 using DockerFlow.Domain;
@@ -83,6 +84,8 @@ public class DockerAPI
         string line;
         StringReader reader = new StringReader(response);
         int contador = 0;
+        bool IsAspnet_request = false;
+        string aspnet_request = "";
         while ((line = reader.ReadLine()) != null){
             if(line == String.Empty){
                 continue; //ignora linhas vazias
@@ -96,17 +99,34 @@ public class DockerAPI
                 DateTime timestamp = matchDatetime(line);
                 string log = line.Substring(39);
 
+                
                 bool system = (log.Contains("XXX==-->") && log.Contains("<--==XXX"))? true : false;
                 if(system){
-                    Console.Write("");
+                    if(log.Contains("Start of request")){
+                        IsAspnet_request = true;
+                    }
+                    if(log.Contains("End of request")){
+                        IsAspnet_request = false;
+                        result.Add(new Log(){
+                            container_id = container.containerID,
+                            timestamp = timestamp.ToUniversalTime(),
+                            info = aspnet_request,
+                            system = true
+                        });  
+                        continue; 
+                    }
+                }
+                if(IsAspnet_request == true && !log.Contains("Start of request")){
+                    aspnet_request += log+Environment.NewLine;
+                    continue;
                 }
 
-                     result.Add(new Log(){
-                         container_id = container.containerID,
-                         timestamp = timestamp.ToUniversalTime(),
-                         info = log,
-                         system = system
-                     });   
+                result.Add(new Log(){
+                    container_id = container.containerID,
+                    timestamp = timestamp.ToUniversalTime(),
+                    info = log,
+                    system = system
+                });   
 
                 contador++;
             }

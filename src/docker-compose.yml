@@ -53,11 +53,41 @@ services:
     networks:
       - dockerflow-network
 
-  example:
-    container_name: example-dockerflow
+  front:
+    container_name: dockerflow-front
+    restart: always
     build:
       context: .
-      dockerfile: ./example/Dockerfile
+      dockerfile: ./front/Dockerfile
+    environment:
+      TZ: America/Cuiaba
+    ports:
+      - 80:3000
+    networks:
+      - dockerflow-network
+    depends_on:
+      - api
+
+
+#Examples
+
+  example-console:
+    container_name: example-console-dockerflow
+    build:
+      context: .
+      dockerfile: ./example-console/Dockerfile
+  
+  example-aspnet:
+    container_name: example-aspnet-dockerflow
+    restart: always
+    build:
+      context: .
+      dockerfile: ./example-aspnet/Dockerfile
+    volumes:
+      - "./appsettings.json:/app/appsettings.json"
+    ports:
+      - 5000:5000
+
 
 networks:
   dockerflow-network:

@@ -11,7 +11,11 @@ export default function ListContainers() {
     const [containers, setContainers] = useState([]);
     useEffect(() => {
 
-        Api.get("/Container").then(function (response) {
+        Api.get("/Container", {
+            headers: {
+              'Referer': 'no-referrer'
+            }
+          }).then(function (response) {
             console.log(response.data);
             setContainers(response.data);
         })

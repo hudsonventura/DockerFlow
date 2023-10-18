@@ -42,8 +42,16 @@ public class SystemLog : Log
                 case string s when s.StartsWith("Starting task"):
                     this.type = SystemLogType.Start;
                     break;
+                
+                case string s when s.StartsWith("Start of request"):
+                    this.type = SystemLogType.Start;
+                    break;
 
                 case string s when s.StartsWith("End of task with success"):
+                    this.type = SystemLogType.SuccessEnd;
+                    break;
+                    
+                case string s when s.StartsWith("End of request"):
                     this.type = SystemLogType.SuccessEnd;
                     break;
 

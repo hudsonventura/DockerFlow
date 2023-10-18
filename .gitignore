@@ -33,3 +33,7 @@ src/Shared/bin/*
 src/Shared/obj/*
 src/package-nuget/obj/*
 src/package-nuget/bin/*
+src/example-aspnet/bin/*
+src/example-aspnet/obj/*
+src/example-console/bin/*
+src/example-console/obj/*
